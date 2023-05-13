@@ -1,30 +1,32 @@
 import React from 'react';
-import {View} from 'react-native';
+import {View, TouchableOpacity, Text} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 import Account from '../components/Account';
 import NewPost from '../components/NewPost';
+import { launchImageLibrary } from 'react-native-image-picker';
 
-export default function AccountNavigation({route}) {
+export default function AccountNavigation({route, navigation}) {
   const setToken = route.params.setToken;
-  console.log(setToken);
 
   const Stack = createNativeStackNavigator();
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen
-          component={Account}
-          name="Account"
-          options={{
-            headerShown: false,
-          }}
-          initialParams={{setToken: setToken}}></Stack.Screen>
-
-          <Stack.Screen>
-            
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Stack.Navigator>
+      <Stack.Screen
+        component={Account}
+        name="Account"
+        options={{
+          headerShown: false,
+        }}
+        initialParams={{setToken: setToken}}></Stack.Screen>
+      <Stack.Screen
+        component={NewPost}
+        options={{
+          headerShown: true,
+          headerTitle: 'New Post'
+        }}
+        name="NewPost"></Stack.Screen>
+    </Stack.Navigator>
   );
 }

@@ -4,6 +4,7 @@ const jwtDecoder = require("jwt-decode");
 
 function authToken(req, res, next) {
   const tokenHeader = req.header("authToken");
+  console.log(req.header('authToken'));
   if (tokenHeader == null || tokenHeader == "")
     return res.status(401).send("No auth token");
 

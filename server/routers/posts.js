@@ -26,6 +26,7 @@ router.get("/:number", tokenValidation.authToken, async (req, res) => {
 
 router.post("/", tokenValidation.authToken, async (req, res) => {
   const { title, image64 } = req.body;
+  console.log(req.body);
   const item = {
     user_id: req.user._id.toString(),
     title: title,

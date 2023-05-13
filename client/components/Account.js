@@ -10,13 +10,12 @@ import {
   StyleSheet,
   Pressable,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Images} from '../images';
 import Svg, {Path} from 'react-native-svg';
 import * as Auth from '../authServices';
-import {matrixTransform} from 'react-native-svg/lib/typescript/elements/Shape';
+import { Colors } from '../color';
+import { launchImageLibrary } from 'react-native-image-picker';
 
-export default function Account({route}) {
+export default function Account({route, navigation}) {
   const [image64, setImage64] = useState('');
   const [user, setUser] = useState();
   const [settingsModalVisibility, setSettingsModalVisibility] = useState(false);
@@ -34,7 +33,6 @@ export default function Account({route}) {
   useEffect(() => {
     (async () => {
       const usr = await Auth.getLoggedUserAsync();
-      console.log(usr);
       setUser(usr);
     })();
   }, []);
@@ -62,28 +60,31 @@ export default function Account({route}) {
               fontWeight: 600,
               textTransform: 'lowercase',
               paddingLeft: 8,
+              color: Colors.primary,
             }}>
             {user?.username}
           </Text>
         </View>
         <View
           style={{margin: 8, dispaly: 'flex', flexDirection: 'row', gap: 16}}>
-          <Svg
-            xmlns="http://www.w3.org/2000/svg"
-            width={24}
-            height={24}
-            fill="black"
-            className="bi bi-plus-square"
-            viewBox="0 0 16 16">
-            <Path
-              d="M14 1a1 1 0 011 1v12a1 1 0 01-1 1H2a1 1 0 01-1-1V2a1 1 0 011-1h12zM2 0a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V2a2 2 0 00-2-2H2z"
-              transform="scale(1)"
-            />
-            <Path
-              d="M8 4a.5.5 0 01.5.5v3h3a.5.5 0 010 1h-3v3a.5.5 0 01-1 0v-3h-3a.5.5 0 010-1h3v-3A.5.5 0 018 4z"
-              transform="scale(1)"
-            />
-          </Svg>
+          <Pressable onPress={()=> navigation.navigate('NewPost')}>
+            <Svg
+              xmlns="http://www.w3.org/2000/svg"
+              width={24}
+              height={24}
+              fill="black"
+              className="bi bi-plus-square"
+              viewBox="0 0 16 16">
+              <Path
+                d="M14 1a1 1 0 011 1v12a1 1 0 01-1 1H2a1 1 0 01-1-1V2a1 1 0 011-1h12zM2 0a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V2a2 2 0 00-2-2H2z"
+                transform="scale(1)"
+              />
+              <Path
+                d="M8 4a.5.5 0 01.5.5v3h3a.5.5 0 010 1h-3v3a.5.5 0 01-1 0v-3h-3a.5.5 0 010-1h3v-3A.5.5 0 018 4z"
+                transform="scale(1)"
+              />
+            </Svg>
+          </Pressable>
 
           <Pressable onPress={showModal}>
             <Svg
@@ -113,7 +114,13 @@ export default function Account({route}) {
           borderBottomWidth: 1,
           borderBottomColor: 'rgb(200,200,200)',
         }}>
-        <View style={{dispaly: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+        <View
+          style={{
+            dispaly: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}>
           <Image
             style={{width: 96, height: 96, borderRadius: 48}}
             source={{uri: 'data:image/png;base64,' + user?.image64}}></Image>
@@ -160,10 +167,31 @@ export default function Account({route}) {
           </View>
         </View>
 
-        <View style={{dispaly: 'flex', flexDirection: 'row', gap: 32, marginTop: 24}}>
+        <View
+          style={{
+            dispaly: 'flex',
+            flexDirection: 'row',
+            gap: 32,
+            marginTop: 24,
+          }}>
           <TouchableOpacity
-            style={{backgroundColor: 'rgb(230,230,230)', width: '100%', paddingVertical: 8, paddingHorizontal: 24, borderRadius: 8}}>
-            <Text style={{fontSize: 14, fontWeight: 600, width: '100%', textAlign: 'center'}} > Edit Profile </Text>
+            style={{
+              backgroundColor: 'rgb(230,230,230)',
+              width: '100%',
+              paddingVertical: 8,
+              paddingHorizontal: 24,
+              borderRadius: 8,
+            }}>
+            <Text
+              style={{
+                fontSize: 14,
+                fontWeight: 600,
+                width: '100%',
+                textAlign: 'center',
+              }}>
+              {' '}
+              Edit Profile{' '}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>

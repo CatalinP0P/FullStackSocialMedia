@@ -6,10 +6,12 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import jwtDecode from 'jwt-decode';
 
 import Svg, {Path} from 'react-native-svg';
+import { Colors } from '../color';
 
 import Account from '../components/Account';
 import Feed from '../components/Feed';
 import Home from '../components/Home';
+import AccountNavigation from './AccountNavigation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function AppNavigator({setToken}) {
@@ -29,7 +31,7 @@ export default function AppNavigator({setToken}) {
                   xmlns="http://www.w3.org/2000/svg"
                   width={32}
                   height={32}
-                  fill={focused ? 'currentColor' : 'grey'}
+                  fill={focused ? Colors.primary : 'grey'}
                   className="bi bi-house-fill">
                   <Path
                     d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L8 2.207l6.646 6.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.707 1.5Z"
@@ -53,7 +55,7 @@ export default function AppNavigator({setToken}) {
                 <Svg
                   width={32}
                   height={32}
-                  fill={focused ? 'currentColor' : 'grey'}
+                  fill={focused ? Colors.primary : "grey"}
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 512 512">
                   <Path
@@ -66,7 +68,9 @@ export default function AppNavigator({setToken}) {
           }}></Tab.Screen>
 
         <Tab.Screen
-          name="Account"
+          component={AccountNavigation}
+          initialParams={{setToken: setToken}}
+          name="AccountTab"
           options={{
             tabBarIcon: ({focused}) => {
               return (
@@ -74,7 +78,7 @@ export default function AppNavigator({setToken}) {
                   xmlns="http://www.w3.org/2000/svg"
                   width={32}
                   height={32}
-                  fill={focused ? 'currentColor' : 'grey'}>
+                  fill={focused ? Colors.primary : 'grey'}>
                   <Path
                     d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3Zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
                     transform="scale(2)"
@@ -83,8 +87,7 @@ export default function AppNavigator({setToken}) {
               );
             },
           }}
-          component={Account}
-          initialParams={{setToken: setToken}}></Tab.Screen>
+        ></Tab.Screen>
       </Tab.Navigator>
     </NavigationContainer>
   );
