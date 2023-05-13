@@ -33,11 +33,6 @@ export default function NewPost() {
         'Content-Type': 'application/json',
         authToken: 'Bearer ' + token,
       },
-
-      body: {
-        title: caption,
-        image64: image64
-      }
     });
 
     api

@@ -1,4 +1,6 @@
 import React, {useEffect, useState} from 'react';
+import { SERVER_ADRESS } from "@env";
+import axios from 'axios';
 import {
   Button,
   Image,
@@ -33,7 +35,18 @@ export default function Account({route, navigation}) {
   useEffect(() => {
     (async () => {
       const usr = await Auth.getLoggedUserAsync();
+      const token = await Auth.getTokenAsync();
+      console.log(token);
       setUser(usr);
+
+      const req = axios.create({
+        headers:{
+          authToken: "Bearer " + token,
+        }
+      })
+      const response = await req.get(SERVER_ADRESS + "profilephotos/" + usr._id);
+      console.log(response.data);
+      setImage64(response.data);
     })();
   }, []);
 
@@ -123,7 +136,7 @@ export default function Account({route, navigation}) {
           }}>
           <Image
             style={{width: 96, height: 96, borderRadius: 48}}
-            source={{uri: 'data:image/png;base64,' + user?.image64}}></Image>
+            source={{uri: 'data:image/png;base64,' + image64}}></Image>
 
           <View
             style={{

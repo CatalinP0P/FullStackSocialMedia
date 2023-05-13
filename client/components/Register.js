@@ -24,6 +24,7 @@ export default function Register(props) {
   const [username, setUsername] = useState('');
 
   const [image64, setImage64] = useState(null);
+  const [imageBinary, setImageBinary] = useState(null);
   const [imageUrl, setImageUrl] = useState('');
 
   const [error, setError] = useState('');

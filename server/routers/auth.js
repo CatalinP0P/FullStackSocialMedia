@@ -4,10 +4,13 @@ const validation = require('../validation')
 const bcrypt = require("bcrypt");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
-const { MongoClient } = require("mongodb");
+const { MongoClient, ObjectId } = require("mongodb");
+const { authToken } = require("../tokenValidation");
+const tokenValidation = require("../tokenValidation");
 
 const client = new MongoClient("mongodb://localhost/testDb");
 const users = client.db().collection("users");
+const profilePhotos = client.db().collection("profilephotos");
 
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
@@ -25,7 +28,6 @@ router.post("/login", async (req, res) => {
 });
 
 router.post("/register", async (req, res) => {
-  console.log(req.body);
   const { username, password, email, firstName, lastName, image64 } = req.body;
 
   // HASHING THE PASSWORD
@@ -39,13 +41,12 @@ router.post("/register", async (req, res) => {
     email: email,
     firstName: firstName,
     lastName: lastName,
-    image64: image64,
   };
 
-  const {error} = validation.registerValidation(req.body);
+  const {error} = validation.registerValidation(user);
   if ( error )
   {
-    console.log(error) 
+    console.log(error)
     return res.status(400).send(error.message);
   }
   
@@ -53,12 +54,31 @@ router.post("/register", async (req, res) => {
   const emailExists = await users.findOne({email: email});
   if ( emailExists != null ) 
     return res.status(400).send('Email already assigned');
+
+  const response = await users.insertOne(user);
   
-
-  console.log(user);
-  users.insertOne(user);
-
-  res.status(201).send("User added");
+  // Adding the profile image to separate collection
+  const userId = response.insertedId;
+  await profilePhotos.insertOne({userId: userId, image64: image64});
+  
+  res.status(201).send("User Added");
 });
+
+router.get('/user/:id', tokenValidation.authToken, async (req, res) => {
+  try
+  {
+    const user = await users.findOne({_id: new ObjectId(req.params.id)});
+    console.log(user);
+    if ( user == null ) res.status(400).send("Bad Request, user not found");
+    
+    res.send(user.username);
+  }
+  catch(err)
+  {
+    res.status(400).send("User not found");
+  }
+
+
+})
 
 module.exports = router;
