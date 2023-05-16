@@ -34,6 +34,14 @@ app.use("/posts", postRouter);
 const profilePhotoRoute = require("./routers/profilephotos");
 app.use("/profilephotos", profilePhotoRoute);
 
+// Likes route
+const likesRouter = require('./routers/likes');
+app.use('/likes', likesRouter);
+
+// Comments route
+const commentsRouter = require('./routers/comments');
+app.use("/comments", commentsRouter);
+
 app.listen(PORT, () => {
   console.log(`Backend running on port ${PORT}`);
 });

@@ -24,7 +24,6 @@ export default function Register(props) {
   const [username, setUsername] = useState('');
 
   const [image64, setImage64] = useState(null);
-  const [imageBinary, setImageBinary] = useState(null);
   const [imageUrl, setImageUrl] = useState('');
 
   const [error, setError] = useState('');
@@ -48,7 +47,7 @@ export default function Register(props) {
     const response = await axios
       .post(adress, {
         email: email.toLowerCase(),
-        username: username,
+        username: username.toLowerCase(),
         password: password,
         firstName: firstName,
         lastName: lastName,

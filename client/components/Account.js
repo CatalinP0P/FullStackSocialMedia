@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { SERVER_ADRESS } from "@env";
+import {SERVER_ADRESS} from '@env';
 import axios from 'axios';
 import {
   Button,
@@ -11,16 +11,18 @@ import {
   Modal,
   StyleSheet,
   Pressable,
+  Dimensions,
 } from 'react-native';
 import Svg, {Path} from 'react-native-svg';
 import * as Auth from '../authServices';
-import { Colors } from '../color';
-import { launchImageLibrary } from 'react-native-image-picker';
+import {Colors} from '../color';
+import {launchImageLibrary} from 'react-native-image-picker';
 
 export default function Account({route, navigation}) {
   const [image64, setImage64] = useState('');
   const [user, setUser] = useState();
   const [settingsModalVisibility, setSettingsModalVisibility] = useState(false);
+  const [myPosts, setMyPosts] = useState([]);
 
   const showModal = () => {
     setSettingsModalVisibility(true);
@@ -30,23 +32,74 @@ export default function Account({route, navigation}) {
     setSettingsModalVisibility(false);
   };
 
+  const getMyPosts = async () => {
+    var req = axios.create({
+      headers: {
+        authToken: 'Bearer ' + (await Auth.getTokenAsync()),
+      },
+    });
+  };
+
   const setToken = route.params.setToken;
 
   useEffect(() => {
     (async () => {
-      const usr = await Auth.getLoggedUserAsync();
+      const usr = await Auth.getLoggedUserFromDBAsync();
       const token = await Auth.getTokenAsync();
-      console.log(token);
       setUser(usr);
 
       const req = axios.create({
-        headers:{
-          authToken: "Bearer " + token,
-        }
-      })
-      const response = await req.get(SERVER_ADRESS + "profilephotos/" + usr._id);
-      console.log(response.data);
+        headers: {
+          authToken: 'Bearer ' + token,
+        },
+      });
+      const response = await req.get(
+        SERVER_ADRESS + 'profilephotos/' + usr._id,
+      );
+      console.log(usr._id);
+      // console.log(response.data);
       setImage64(response.data);
+
+      req
+        .get(SERVER_ADRESS + 'posts/user/' + usr._id)
+        .then(async response => {
+          for (var i = 0; i < response.data.length; i++) {
+            const username = await Auth.getUsername(response.data[i].user_id);
+            const profilepicture = await Auth.getImage(
+              response.data[i].user_id,
+            );
+            response.data[i] = {
+              ...response.data[i],
+              username: username,
+              profilepicture: profilepicture,
+            };
+
+            // Like Count and like state
+            const token = await Auth.getTokenAsync();
+            const req = axios.create({
+              headers: {
+                authToken: 'Bearer ' + token,
+              },
+            });
+
+            var adress = SERVER_ADRESS + 'likes/count/' + response.data[i]._id;
+            var res = await req.get(adress);
+
+            response.data[i] = {...response.data[i], likes: res.data};
+
+            adress = SERVER_ADRESS + 'likes/status/' + response.data[i]._id;
+            res = await req.get(adress);
+
+            const liked = res.data == 0 ? false : true;
+
+            response.data[i] = {...response.data[i], liked: liked};
+          }
+
+          setMyPosts(response.data);
+        })
+        .catch(err => {
+          console.error(err.response.data);
+        });
     })();
   }, []);
 
@@ -80,7 +133,7 @@ export default function Account({route, navigation}) {
         </View>
         <View
           style={{margin: 8, dispaly: 'flex', flexDirection: 'row', gap: 16}}>
-          <Pressable onPress={()=> navigation.navigate('NewPost')}>
+          <Pressable onPress={() => navigation.navigate('NewPost')}>
             <Svg
               xmlns="http://www.w3.org/2000/svg"
               width={24}
@@ -115,7 +168,8 @@ export default function Account({route, navigation}) {
           </Pressable>
         </View>
       </View>
-
+      
+      {/* Header with image and data */}
       <View
         style={{
           display: 'flex',
@@ -180,6 +234,11 @@ export default function Account({route, navigation}) {
           </View>
         </View>
 
+        {/* Bio */}
+        <View style={{paddingTop: 16}} >
+          <Text style={{fontSize: 20, fontWeight: 700}}> {user?.name} </Text>
+        </View>
+
         <View
           style={{
             dispaly: 'flex',
@@ -194,7 +253,8 @@ export default function Account({route, navigation}) {
               paddingVertical: 8,
               paddingHorizontal: 24,
               borderRadius: 8,
-            }}>
+            }}
+            onPress={() => navigation.navigate('EditProfile')}>
             <Text
               style={{
                 fontSize: 14,
@@ -208,6 +268,22 @@ export default function Account({route, navigation}) {
           </TouchableOpacity>
         </View>
       </View>
+
+
+      {/* Posts area */}
+      <View style={{display: 'flex', flexWrap: 'wrap', flexDirection: 'row'}}>
+        {myPosts.map(post => {
+          const {width} = Dimensions.get('window');
+          const size = width / 3;
+          return (
+            <Image
+              key={post._id}
+              style={{width: size, height: size}}
+              source={{uri: 'data:image/png;base64,' + post.image64}}></Image>
+          );
+        })}
+      </View>
+
       <Modal
         visible={settingsModalVisibility}
         transparent

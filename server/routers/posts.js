@@ -12,15 +12,24 @@ const posts = client.db().collection("posts");
 
 
 router.get("/", tokenValidation.authToken, async (req, res) => {
-  var postsDocuments = await posts.find({}).sort({date: 1}).toArray();
+  var postsDocuments = await posts.find({}).sort({ date: -1 }).toArray();
   console.log(postsDocuments);
   res.send(postsDocuments);
+});
+
+router.get("/user/:id", tokenValidation.authToken, async (req, res) => {
+  var postDocs = await posts.find({user_id: req.params.id}).sort({date: -1}).toArray()
+  res.send(postDocs);
 });
 
 router.get("/:number", tokenValidation.authToken, async (req, res) => {
   const number = req.params.number;
   console.log(number);
-  var postsDocuments = await posts.find({}).limit(parseInt(number)).toArray();
+  var postsDocuments = await posts
+    .find({})
+    .sort({ date: -1 })
+    .limit(parseInt(number))
+    .toArray();
   res.send(postsDocuments);
 });
 

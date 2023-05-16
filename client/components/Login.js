@@ -20,8 +20,7 @@ export default function Login({navigation, route}) {
     const body = {email: email.toLowerCase(), password: password};
     console.log(adress);
     const response = await axios.post(adress, body).catch(err => {
-      console.log(err.response.data);
-      setError(err.response.data);
+      console.log(err);
       return;
     });
 

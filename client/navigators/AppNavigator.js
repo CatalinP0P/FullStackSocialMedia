@@ -4,6 +4,7 @@ import {View, Text, TouchableOpacity, Button, Image} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import jwtDecode from 'jwt-decode';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Svg, {Path} from 'react-native-svg';
 import { Colors } from '../color';
@@ -12,7 +13,7 @@ import Account from '../components/Account';
 import Feed from '../components/Feed';
 import Home from '../components/Home';
 import AccountNavigation from './AccountNavigation';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import HomeNavigation from './HomeNavigation';
 
 export default function AppNavigator({setToken}) {
   const Tab = createBottomTabNavigator();
@@ -22,8 +23,8 @@ export default function AppNavigator({setToken}) {
       <Tab.Navigator
         screenOptions={{headerShown: false, tabBarShowLabel: false}}>
         <Tab.Screen
-          component={Home}
-          name="Home"
+          component={HomeNavigation}
+          name="HomeTab"
           options={{
             tabBarIcon: ({focused}) => {
               return (
