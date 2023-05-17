@@ -1,48 +1,26 @@
 import {SERVER_ADRESS} from '@env';
 import React, {useEffect, useState} from 'react';
-import {Colors} from '../color';
 import axios from 'axios';
-import * as Auth from '../authServices';
-import {
-  Dimensions,
-  SafeAreaView,
-  View,
-  Image,
-  Button,
-  Text,
-  ScrollView,
-  requireNativeComponent,
-  Pressable,
-  LogBox
-} from 'react-native';
-
-LogBox.ignoreLogs([
-  'Non-serializable values were found in the navigation state',
-]);
-
-import {Path, Svg} from 'react-native-svg';
-import {ServerContainer} from '@react-navigation/native';
-
 import Posts from './Posts';
+import * as Auth from '../authServices';
 
-export default function Home({navigation, route}) {
+export default function MyPosts({navigation, route}) {
   const [posts, setPosts] = useState([]);
-
-  const {setPost} = route.params;
+  const setPost = route.params.setPost;
+  const setUserId = route.params.setUserId;
 
   useEffect(() => {
     (async () => {
+      const user = await Auth.getLoggedUserFromDBAsync();
       const token = await Auth.getTokenAsync();
-
-      // Getting the last 20 posts;
-      const req = axios.create({
+      var req = axios.create({
         headers: {
           authToken: 'Bearer ' + token,
         },
       });
 
       req
-        .get(SERVER_ADRESS + 'posts/20')
+        .get(SERVER_ADRESS + 'posts/user/' + user._id)
         .then(async response => {
           for (var i = 0; i < response.data.length; i++) {
             const username = await Auth.getUsername(response.data[i].user_id);
@@ -79,14 +57,16 @@ export default function Home({navigation, route}) {
           setPosts(response.data);
         })
         .catch(err => {
-          console.error(err);
+          console.error(err.response.data);
         });
     })();
-  }, []);
-
-  const {width, height} = Dimensions.get('window');
+  });
 
   return (
-    <Posts posts={posts} setPost={setPost} navigation={navigation} setUserId={route.params.setUserId} ></Posts>
+    <Posts
+      posts={posts}
+      setPost={setPost}
+      setUserId={setUserId}
+      navigation={navigation}></Posts>
   );
 }

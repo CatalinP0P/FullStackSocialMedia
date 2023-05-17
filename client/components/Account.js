@@ -276,10 +276,12 @@ export default function Account({route, navigation}) {
           const {width} = Dimensions.get('window');
           const size = width / 3;
           return (
-            <Image
-              key={post._id}
-              style={{width: size, height: size}}
-              source={{uri: 'data:image/png;base64,' + post.image64}}></Image>
+            <Pressable onPress={() => {navigation.navigate("MyPosts")}} >
+              <Image
+                key={post._id}
+                style={{width: size, height: size}}
+                source={{uri: 'data:image/png;base64,' + post.image64}}></Image>
+            </Pressable>
           );
         })}
       </View>
