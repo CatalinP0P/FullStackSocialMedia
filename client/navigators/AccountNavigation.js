@@ -60,7 +60,7 @@ export default function AccountNavigation({route, navigation}) {
       <Stack.Screen 
       component={ProfilesList}
       name="ProfilesList"
-      initialParams={{profiles: profiles}}
+      initialParams={{profiles: profiles, setUserId: setUserId}}
       ></Stack.Screen>
       <Stack.Screen
         component={MyPosts}

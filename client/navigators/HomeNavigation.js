@@ -51,7 +51,7 @@ export default function HomeNavigation() {
       <Stack.Screen
         component={ProfilesList}
         name='ProfilesList'
-        initialParams={{profiles: profiles}}
+        initialParams={{profiles: profiles, setUserId: setUserId}}
       ></Stack.Screen>
 
       <Stack.Screen

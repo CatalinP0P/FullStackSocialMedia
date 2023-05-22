@@ -44,7 +44,7 @@ export default function Posts(props) {
           image64: response.data[i].photo[0].image64,
         };
       }
-      
+
       setProfiles(response.data);
       setTimeout(() => {
         navigation.navigate('ProfilesList');
