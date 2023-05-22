@@ -45,7 +45,7 @@ export default function HomeNavigation() {
 
       <Stack.Screen
         component={Profile}
-        initialParams={{userId: userId}}
+        initialParams={{userId: userId, setProfiles: setProfiles}}
         name="Profile"></Stack.Screen>
 
       <Stack.Screen

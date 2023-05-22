@@ -37,6 +37,7 @@ export default function AccountNavigation({route, navigation}) {
           setToken: setToken,
           setUeserId: setUserId,
           setPost: setPost,
+          setProfiles: setProfiles,
         }}></Stack.Screen>
       <Stack.Screen
         component={NewPost}

@@ -26,6 +26,8 @@ export default function Account({route, navigation}) {
   const [following, setFollowing] = useState([]);
   const [myPosts, setMyPosts] = useState([]);
 
+  const setProfiles = route.params.setProfiles;
+
   const showModal = () => {
     setSettingsModalVisibility(true);
   };
@@ -50,8 +52,6 @@ export default function Account({route, navigation}) {
       const response = await req.get(
         SERVER_ADRESS + 'profilephotos/' + usr._id,
       );
-      console.log(usr._id);
-      // console.log(response.data);
       setImage64(response.data);
 
       req
@@ -99,17 +99,31 @@ export default function Account({route, navigation}) {
     (async () => {
       const req = axios.create({
         headers: {
-          authToken: "Bearer " + await Auth.getTokenAsync(), 
-        }
-      })
+          authToken: 'Bearer ' + (await Auth.getTokenAsync()),
+        },
+      });
 
       const user = await Auth.getLoggedUserAsync();
-      var adress = SERVER_ADRESS + "following/followers/" + user._id;
-      var response = await req.get(adress)
-      setFollowers(response.data)
+      var adress = SERVER_ADRESS + 'following/followers/' + user._id;
+      var response = await req.get(adress);
+      for (var i = 0; i < response.data.length; i++) {
+        const follower_id = response.data[i].follower_id;
+        const username = await Auth.getUsername(follower_id);
+        const image64 = await Auth.getImage(follower_id);
+  
+        response.data[i] = {_id: follower_id, username: username, image64: image64};
+      }
+      setFollowers(response.data);
 
-      adress = SERVER_ADRESS + "following/following/" + user._id;
+      adress = SERVER_ADRESS + 'following/following/' + user._id;
       response = await req.get(adress);
+      for (var i = 0; i < response.data.length; i++) {
+        const userId = response.data[i].following_id;
+        const image64 = await Auth.getImage(userId);
+        const username = await Auth.getUsername(userId);
+
+        response.data[i] = {_id: userId, image64: image64, username: username};
+      }
       setFollowing(response.data);
     })();
   }, []);
@@ -179,7 +193,7 @@ export default function Account({route, navigation}) {
           </Pressable>
         </View>
       </View>
-      
+
       {/* Header with image and data */}
       <View
         style={{
@@ -228,8 +242,17 @@ export default function Account({route, navigation}) {
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
-              <Text style={{fontWeight: 600}}>{followers.length}</Text>
-              <Text> Followers </Text>
+              <Pressable
+                style={{alignItems: 'center'}}
+                onPress={() => {
+                  setProfiles(followers);
+                  setTimeout(() => {
+                    navigation.navigate('ProfilesList');
+                  }, 125);
+                }}>
+                <Text style={{fontWeight: 600}}>{followers.length}</Text>
+                <Text> Followers </Text>
+              </Pressable>
             </View>
 
             <View
@@ -239,14 +262,23 @@ export default function Account({route, navigation}) {
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
-              <Text style={{fontWeight: 600}}>{following.length}</Text>
-              <Text> Following </Text>
+              <Pressable
+                style={{alignItems: 'center'}}
+                onPress={() => {
+                  setProfiles(following);
+                  setTimeout(() => {
+                    navigation.navigate('ProfilesList');
+                  }, 125);
+                }}>
+                <Text style={{fontWeight: 600}}>{following.length}</Text>
+                <Text> Following </Text>
+              </Pressable>
             </View>
           </View>
         </View>
 
         {/* Bio */}
-        <View style={{paddingTop: 16}} >
+        <View style={{paddingTop: 16}}>
           <Text style={{fontSize: 20, fontWeight: 700}}> {user?.name} </Text>
         </View>
 
@@ -273,21 +305,28 @@ export default function Account({route, navigation}) {
                 width: '100%',
                 textAlign: 'center',
               }}>
-              {' '}
-              Edit Profile{' '}
+              Edit Profile
             </Text>
           </TouchableOpacity>
         </View>
       </View>
 
-
       {/* Posts area */}
-      <View style={{display: 'flex', flexWrap: 'wrap', flexDirection: 'row', marginTop: 16}}>
+      <View
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          flexDirection: 'row',
+          marginTop: 16,
+        }}>
         {myPosts.map(post => {
           const {width} = Dimensions.get('window');
           const size = width / 3;
           return (
-            <Pressable onPress={() => {navigation.navigate("MyPosts")}} >
+            <Pressable
+              onPress={() => {
+                navigation.navigate('MyPosts');
+              }}>
               <Image
                 key={post._id}
                 style={{width: size, height: size}}

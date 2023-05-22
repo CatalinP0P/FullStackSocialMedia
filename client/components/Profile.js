@@ -15,6 +15,7 @@ import {
   Pressable,
   Touchable,
   TouchableOpacity,
+  useAnimatedValue,
 } from 'react-native';
 import {Path, RNSVGSymbol, Svg} from 'react-native-svg';
 import {ServerContainer} from '@react-navigation/native';
@@ -26,7 +27,6 @@ export default function Profile({navigation, route}) {
   const [image64, setImage64] = useState();
   const [following, setFollowing] = useState([]);
   const [followers, setFollowers] = useState([]);
-
   const [fol, setFol] = useState(0);
 
   const followButtonRef = useRef();
@@ -63,7 +63,6 @@ export default function Profile({navigation, route}) {
     const user = await Auth.getUserById(route.params.userId);
     setUser(user);
 
-    console.log(route.params.userId);
     const image = await Auth.getImage(route.params.userId);
     setImage64(image);
 
@@ -87,11 +86,34 @@ export default function Profile({navigation, route}) {
     var response = await req.get(
       SERVER_ADRESS + 'following/followers/' + route.params.userId,
     );
+    for (var i = 0; i < response.data.length; i++) {
+      const follower_id = response.data[i].follower_id;
+      const username = await Auth.getUsername(follower_id);
+      const image64 = await Auth.getImage(follower_id);
+
+      response.data[i] = {
+        _id: follower_id,
+        username: username,
+        image64: image64,
+      };
+    }
     setFollowers(response.data);
 
     response = await req.get(
       SERVER_ADRESS + 'following/following/' + route.params.userId,
     );
+    for (var i = 0; i < response.data.length; i++) {
+      const following_id = response.data[i].following_id;
+      const username = await Auth.getUsername(following_id);
+      const image64 = await Auth.getImage(following_id);
+
+      response.data[i] = {
+        _id: following_id,
+        username: username,
+        image64: image64,
+      };
+    }
+
     setFollowing(response.data);
 
     // Checking if the person visiting if following the person
@@ -160,8 +182,16 @@ export default function Profile({navigation, route}) {
               alignItems: 'center',
               justifyContent: 'center',
             }}>
-            <Text style={{fontWeight: 600}}>{followers.length}</Text>
-            <Text> Followers </Text>
+            <Pressable style={{alignItems: "center"}}
+            onPress={() => {
+              setProfiles(followers);
+              setTimeout(() => {
+                navigation.navigate("ProfilesList")
+              }, 125); 
+            }} >
+              <Text style={{fontWeight: 600}}>{followers.length}</Text>
+              <Text> Followers </Text>
+            </Pressable>
           </View>
 
           <View
@@ -171,8 +201,17 @@ export default function Profile({navigation, route}) {
               alignItems: 'center',
               justifyContent: 'center',
             }}>
-            <Text style={{fontWeight: 600}}>{following.length}</Text>
-            <Text> Following </Text>
+            <Pressable
+              style={{alignItems: 'center'}}
+              onPress={() => {
+                setProfiles(following);
+                setTimeout(() => {
+                  navigation.navigate('ProfilesList');
+                }, 125);
+              }}>
+              <Text style={{fontWeight: 600}}>{following.length}</Text>
+              <Text> Following </Text>
+            </Pressable>
           </View>
         </View>
       </View>

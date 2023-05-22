@@ -28,20 +28,27 @@ const {width, height} = Dimensions.get('window');
 export default function Posts(props) {
   const [posts, setPosts] = useState([]);
   const setProfiles = props.setProfiles;
-  
-  const showLikes = async (postId) => {
+
+  const showLikes = async postId => {
     var req = axios.create({
       headers: {
-        authToken: "Bearer " + await Auth.getTokenAsync(),
-      }
-    })
+        authToken: 'Bearer ' + (await Auth.getTokenAsync()),
+      },
+    });
 
-    req.get(SERVER_ADRESS + "likes/profiles/" + postId).then(async response => {
-      setProfiles(response.data);
+    req.get(SERVER_ADRESS + 'likes/profiles/' + postId).then(async response => {
+      for (var i = 0; i < response.data.length; i++) {
+        response.data[i] = {
+          _id: response.data[i].user[0]._id,
+          username: response.data[i].user[0].username,
+          image64: response.data[i].photo[0].image64,
+        };
+      }
       
+      setProfiles(response.data);
       setTimeout(() => {
-        navigation.navigate("ProfilesList");
-      }, 125)
+        navigation.navigate('ProfilesList');
+      }, 125);
     });
   };
 

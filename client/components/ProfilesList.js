@@ -6,8 +6,6 @@ export default function ProfilesList({navigation, route}) {
 
   useEffect(() => {
     setProfiles(route.params.profiles);
-    console.log(route.params.profiles[0].user[0].username);
-
   }, []);
 
   return (
@@ -16,8 +14,8 @@ export default function ProfilesList({navigation, route}) {
         {profiles.map(profile => {
           return (
           <View style={{display: "flex", flexDirection: "row", gap: 16, marginHorizontal: 4, alignItems: "center", marginTop: 8}} >
-            <Image style={{width: 64, height: 64, borderRadius: 32}} source={{uri: "data:image/png;base64," + profile.photo[0].image64}} ></Image>
-            <Text style={{fontSize: 24}} >{profile.user[0].username}</Text>
+            <Image style={{width: 64, height: 64, borderRadius: 32}} source={{uri: "data:image/png;base64," + profile.image64}} ></Image>
+            <Text style={{fontSize: 24}} >{profile.username}</Text>
           </View>
           )
         })}
