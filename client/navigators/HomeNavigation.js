@@ -7,21 +7,29 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Home from '../components/Home';
 import Comments from '../components/Comments';
 import Profile from '../components/Profile';
+import Posts from '../components/Posts';
+import ProfilePosts from '../components/ProfilePosts';
+import ProfilesList from '../components/ProfilesList';
 
 export default function HomeNavigation() {
   const Stack = createNativeStackNavigator();
 
   const [post, setPost] = useState();
+  const [profiles, setProfiles] = useState();
   const [userId, setUserId] = useState();
 
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+    screenOptions={{
+      headerStyle: {backgroundColor: "#f8f4f4"}
+    }}>
       <Stack.Screen
         component={Home}
         name="Home"
         initialParams={{
           setPost: setPost,
           setUserId: setUserId,
+          setProfiles: setProfiles
         }}
         options={{
           headerShown: false,
@@ -39,6 +47,22 @@ export default function HomeNavigation() {
         component={Profile}
         initialParams={{userId: userId}}
         name="Profile"></Stack.Screen>
+
+      <Stack.Screen
+        component={ProfilesList}
+        name='ProfilesList'
+        initialParams={{profiles: profiles}}
+      ></Stack.Screen>
+
+      <Stack.Screen
+        component={ProfilePosts}
+        name="ProfilePosts"
+        initialParams={{
+          userId: userId,
+          setPost: setPost,
+          setUserId: setUserId,
+          setProfiles: setProfiles
+        }}></Stack.Screen>
     </Stack.Navigator>
   );
 }

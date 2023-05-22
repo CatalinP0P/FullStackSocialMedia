@@ -6,12 +6,19 @@ import * as Auth from '../authServices';
 
 export default function MyPosts({navigation, route}) {
   const [posts, setPosts] = useState([]);
+  const [username, setUsername] = useState('');
   const setPost = route.params.setPost;
+  const setProfiles = route.params.setProfiles;
   const setUserId = route.params.setUserId;
+
+  navigation.setOptions({
+    title: `${username} Posts`
+  })
 
   useEffect(() => {
     (async () => {
       const user = await Auth.getLoggedUserFromDBAsync();
+      setUsername(user.username);
       const token = await Auth.getTokenAsync();
       var req = axios.create({
         headers: {
@@ -67,6 +74,7 @@ export default function MyPosts({navigation, route}) {
       posts={posts}
       setPost={setPost}
       setUserId={setUserId}
+      setProfiles={setProfiles}
       navigation={navigation}></Posts>
   );
 }

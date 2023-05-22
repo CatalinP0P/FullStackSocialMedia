@@ -87,6 +87,6 @@ export default function Home({navigation, route}) {
   const {width, height} = Dimensions.get('window');
 
   return (
-    <Posts posts={posts} setPost={setPost} navigation={navigation} setUserId={route.params.setUserId} ></Posts>
+    <Posts posts={posts} setPost={setPost} navigation={navigation} setUserId={route.params.setUserId} setProfiles={route.params.setProfiles} ></Posts>
   );
 }

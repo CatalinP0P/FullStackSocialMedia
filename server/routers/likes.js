@@ -23,6 +23,18 @@ router.get("/count/:postid", async (req, res) => {
   }
 });
 
+router.get("/profiles/:postid", tokenValidation.authToken, async (req, res) => {
+  var id = new ObjectId(req.params.postid);
+  const profiles = await likes.aggregate([
+    {$match: {post_id: id}},
+    {$lookup: {from: "users", localField: "user_id", foreignField: "_id", as: "user" }},
+    {$lookup: {from: "profilephotos", localField: "user_id", foreignField: "userId", as: "photo"}},
+    {$project: {user: {_id: 1, username: 1}, photo: {image64: 1}} }
+  ]).toArray();
+
+  res.send(profiles);
+})
+
 router.get("/status/:postid", tokenValidation.authToken, async (req, res) => {
   const user = req.user;
   try {

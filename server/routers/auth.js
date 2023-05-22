@@ -123,7 +123,22 @@ router.post("/user/update", tokenValidation.authToken, async (req, res) => {
   {
     res.status(400).send("All parameters must be specified");
   }
-
 });
+
+router.get("/users/q/:username", async (req, res) => {
+  const query = {username: {$regex: req.params.username, $options: 'i'}};
+  var docs = await users.find(query).limit(10).toArray();
+  var docsWithoutPasswordAndEmail = [];
+  docs.forEach(doc => {
+    var item = {
+      username: doc.username,
+      name: doc.name,
+      _id: doc._id
+    }
+
+    docsWithoutPasswordAndEmail.push(item);
+  });
+  res.send(docsWithoutPasswordAndEmail);
+})
 
 module.exports = router;

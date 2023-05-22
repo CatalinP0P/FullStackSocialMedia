@@ -14,6 +14,7 @@ import Feed from '../components/Feed';
 import Home from '../components/Home';
 import AccountNavigation from './AccountNavigation';
 import HomeNavigation from './HomeNavigation';
+import ExploreTab from '../components/ExploreTab';
 
 export default function AppNavigator({setToken}) {
   const Tab = createBottomTabNavigator();
@@ -21,7 +22,7 @@ export default function AppNavigator({setToken}) {
   return (
     <NavigationContainer>
       <Tab.Navigator
-        screenOptions={{headerShown: false, tabBarShowLabel: false}}>
+        screenOptions={{headerShown: false, tabBarShowLabel: false, headerStyle: {backgroundColor: "#f8f4f4"}}}>
         <Tab.Screen
           component={HomeNavigation}
           name="HomeTab"
@@ -48,8 +49,8 @@ export default function AppNavigator({setToken}) {
           }}></Tab.Screen>
 
         <Tab.Screen
-          name="Feed"
-          component={Feed}
+          name="Explore Tab"
+          component={ExploreTab}
           options={{
             tabBarIcon: ({focused}) => {
               return (

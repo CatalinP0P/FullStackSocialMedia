@@ -27,6 +27,23 @@ const {width, height} = Dimensions.get('window');
 
 export default function Posts(props) {
   const [posts, setPosts] = useState([]);
+  const setProfiles = props.setProfiles;
+  
+  const showLikes = async (postId) => {
+    var req = axios.create({
+      headers: {
+        authToken: "Bearer " + await Auth.getTokenAsync(),
+      }
+    })
+
+    req.get(SERVER_ADRESS + "likes/profiles/" + postId).then(async response => {
+      setProfiles(response.data);
+      
+      setTimeout(() => {
+        navigation.navigate("ProfilesList");
+      }, 125)
+    });
+  };
 
   const navigation = props.navigation;
   const setPost = props.setPost;
@@ -58,6 +75,12 @@ export default function Posts(props) {
 
   useEffect(() => {
     setPosts(props.posts);
+  });
+
+  navigation.setOptions({
+    headerStyle: {
+      backgroundColor: '#f2f2f2',
+    },
   });
 
   return (
@@ -143,7 +166,7 @@ export default function Posts(props) {
                         setPost(post);
                         setTimeout(() => {
                           navigation.navigate('Comments');
-                        }, 10);
+                        }, 250);
                       }}>
                       <Svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -163,9 +186,11 @@ export default function Posts(props) {
                   </View>
                 </View>
 
-                <Text style={{fontSize: 16, fontWeight: 700, marginTop: 8}}>
-                  {post.likes} likes
-                </Text>
+                <Pressable onPress={() => showLikes(post._id)}>
+                  <Text style={{fontSize: 16, fontWeight: 700, marginTop: 8}}>
+                    {post.likes} likes
+                  </Text>
+                </Pressable>
 
                 <Text
                   style={{fontSize: 16, marginTop: 8, color: Colors.black25}}>

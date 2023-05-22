@@ -24,8 +24,7 @@ export default function LoginNavigator({setToken}, props) {
           name="Register"
           component={Register}
           options={{
-            headerStyle: {backgroundColor: Colors.primary},
-            headerTitleStyle: {color: 'white'},
+            headerStyle: {backgroundColor: "#f8f4f4"},
           }}></Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>

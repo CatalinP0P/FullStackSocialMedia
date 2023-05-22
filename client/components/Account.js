@@ -22,6 +22,8 @@ export default function Account({route, navigation}) {
   const [image64, setImage64] = useState('');
   const [user, setUser] = useState();
   const [settingsModalVisibility, setSettingsModalVisibility] = useState(false);
+  const [followers, setFollowers] = useState([]);
+  const [following, setFollowing] = useState([]);
   const [myPosts, setMyPosts] = useState([]);
 
   const showModal = () => {
@@ -30,14 +32,6 @@ export default function Account({route, navigation}) {
 
   const hideModel = () => {
     setSettingsModalVisibility(false);
-  };
-
-  const getMyPosts = async () => {
-    var req = axios.create({
-      headers: {
-        authToken: 'Bearer ' + (await Auth.getTokenAsync()),
-      },
-    });
   };
 
   const setToken = route.params.setToken;
@@ -100,6 +94,23 @@ export default function Account({route, navigation}) {
         .catch(err => {
           console.error(err.response.data);
         });
+    })();
+
+    (async () => {
+      const req = axios.create({
+        headers: {
+          authToken: "Bearer " + await Auth.getTokenAsync(), 
+        }
+      })
+
+      const user = await Auth.getLoggedUserAsync();
+      var adress = SERVER_ADRESS + "following/followers/" + user._id;
+      var response = await req.get(adress)
+      setFollowers(response.data)
+
+      adress = SERVER_ADRESS + "following/following/" + user._id;
+      response = await req.get(adress);
+      setFollowing(response.data);
     })();
   }, []);
 
@@ -206,7 +217,7 @@ export default function Account({route, navigation}) {
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
-              <Text style={{fontWeight: 600}}>1</Text>
+              <Text style={{fontWeight: 600}}>{myPosts.length}</Text>
               <Text> Posts </Text>
             </View>
 
@@ -217,7 +228,7 @@ export default function Account({route, navigation}) {
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
-              <Text style={{fontWeight: 600}}>916</Text>
+              <Text style={{fontWeight: 600}}>{followers.length}</Text>
               <Text> Followers </Text>
             </View>
 
@@ -228,7 +239,7 @@ export default function Account({route, navigation}) {
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
-              <Text style={{fontWeight: 600}}>715</Text>
+              <Text style={{fontWeight: 600}}>{following.length}</Text>
               <Text> Following </Text>
             </View>
           </View>
@@ -271,7 +282,7 @@ export default function Account({route, navigation}) {
 
 
       {/* Posts area */}
-      <View style={{display: 'flex', flexWrap: 'wrap', flexDirection: 'row'}}>
+      <View style={{display: 'flex', flexWrap: 'wrap', flexDirection: 'row', marginTop: 16}}>
         {myPosts.map(post => {
           const {width} = Dimensions.get('window');
           const size = width / 3;

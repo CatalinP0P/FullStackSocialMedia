@@ -13,7 +13,7 @@ import React, {useEffect, useState} from 'react';
 import * as Auth from '../authServices';
 import axios from 'axios';
 import {Colors} from '../color';
-import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
+import {get} from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 
 export default function Comments({route, navigation}) {
   const [profilePhoto, setProfilePhoto] = useState();
@@ -23,8 +23,7 @@ export default function Comments({route, navigation}) {
   const post = route.params.post;
 
   const sendComment = async () => {
-
-    if ( newComment.trim() == "" ) return;
+    if (newComment.trim() == '') return;
 
     const token = await Auth.getTokenAsync();
     var req = axios.create({
@@ -34,7 +33,9 @@ export default function Comments({route, navigation}) {
     });
 
     req
-      .post(SERVER_ADRESS + 'comments/' + post._id, {comment: newComment.trim()})
+      .post(SERVER_ADRESS + 'comments/' + post._id, {
+        comment: newComment.trim(),
+      })
       .then(response => {
         console.log(response.data.insertedId);
         setNewComment('');
@@ -85,6 +86,12 @@ export default function Comments({route, navigation}) {
     getComments();
   }, []);
 
+  navigation.setOptions({
+    headerStyle: {
+      backgroundColor: "#f2f2f2",
+    }
+  })
+
   return (
     <SafeAreaView style={{display: 'flex', flexDirection: 'column', flex: 1}}>
       <ScrollView style={{flex: 1, gap: 8}}>
@@ -113,6 +120,7 @@ export default function Comments({route, navigation}) {
         {comments.map(comment => {
           return (
             <View
+              key={comment._id}
               style={{
                 display: 'flex',
                 flexDirection: 'row',
@@ -134,7 +142,9 @@ export default function Comments({route, navigation}) {
                 <Text style={{fontSize: 16, fontWeight: 700}}>
                   {comment.username}
                 </Text>
-                <Text style={{fontSize: 16, marginRight: 75}}>{comment.comment}</Text>
+                <Text style={{fontSize: 16, marginRight: 75}}>
+                  {comment.comment}
+                </Text>
               </View>
             </View>
           );

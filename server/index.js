@@ -42,6 +42,10 @@ app.use('/likes', likesRouter);
 const commentsRouter = require('./routers/comments');
 app.use("/comments", commentsRouter);
 
+// Following system route
+const followingRouter = require("./routers/following");
+app.use("/following", followingRouter);
+
 app.listen(PORT, () => {
   console.log(`Backend running on port ${PORT}`);
 });

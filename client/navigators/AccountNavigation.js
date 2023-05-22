@@ -12,16 +12,21 @@ import MyPosts from '../components/MyPosts';
 import Comments from '../components/Comments';
 import Profile from '../components/Profile';
 import EditProfile from '../components/EditProfile';
+import ProfilesList from '../components/ProfilesList';
+import { setTSpan } from 'react-native-svg/lib/typescript/lib/extract/extractText';
 
 export default function AccountNavigation({route, navigation}) {
   const setToken = route.params.setToken;
 
   const [post, setPost] = useState();
   const [userId, setUserId] = useState();
+  const [profiles, setProfiles] = useState([]);
 
   const Stack = createNativeStackNavigator();
   return (
-    <Stack.Navigator>
+    <Stack.Navigator screenOptions={{
+      headerStyle: {backgroundColor: "#f8f4f4"}
+    }}>
       <Stack.Screen
         component={Account}
         name="Account"
@@ -51,7 +56,15 @@ export default function AccountNavigation({route, navigation}) {
         component={Profile}
         name="Profile"
         initialParams={{userId: userId}}></Stack.Screen>
-      <Stack.Screen component={MyPosts} name="MyPosts" initialParams={{setPost: setPost, setUserId}}></Stack.Screen>
+      <Stack.Screen 
+      component={ProfilesList}
+      name="ProfilesList"
+      initialParams={{profiles: profiles}}
+      ></Stack.Screen>
+      <Stack.Screen
+        component={MyPosts}
+        name="MyPosts"
+        initialParams={{setPost: setPost, setUserId, setProfiles: setProfiles}}></Stack.Screen>
 
       <Stack.Screen component={EditProfile} name="EditProfile"></Stack.Screen>
     </Stack.Navigator>
