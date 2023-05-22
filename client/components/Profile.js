@@ -29,52 +29,88 @@ export default function Profile({navigation, route}) {
 
   const [fol, setFol] = useState(0);
 
+  const followButtonRef = useRef();
   const setProfiles = route.params.setProfiles;
 
-  const handleFollowButton = async () => {};
+  const handleFollowButton = async () => {
+    var authToken = await Auth.getTokenAsync();
+    var req = axios.create({
+      headers: {
+        authToken: 'Bearer ' + authToken,
+      },
+    });
 
-  useEffect(() => {
-    (async () => {
-      const user = await Auth.getUserById(route.params.userId);
-      setUser(user);
-
-      console.log(route.params.userId);
-      const image = await Auth.getImage(route.params.userId);
-      setImage64(image);
-
-      // Getting the posts
-      const token = await Auth.getTokenAsync();
-      const req = axios.create({
-        headers: {
-          authToken: 'Bearer ' + token,
-        },
+    if (fol == 0) {
+      const adress = SERVER_ADRESS + 'following/' + user._id;
+      const response = await req.post(adress).catch(err => {
+        return console.log(err.response.data);
       });
 
-      req
-        .get(SERVER_ADRESS + 'posts/user/' + route.params.userId)
-        .then(async response => {
-          setPosts(response.data);
-        })
-        .catch(err => {
-          console.error(err.response.data);
-        });
+      setFol(1);
+      getProfileDetails();
+    } else {
+      const adress = SERVER_ADRESS + 'following/' + user._id;
+      const repsonse = await req.delete(adress).catch(err => {
+        return console.log(err.response.data);
+      });
 
-      var response = await req.get(
-        SERVER_ADRESS + 'following/followers/' + route.params.userId,
-      );
-      setFollowers(response.data);
+      setFol(0);
+      getProfileDetails();
+    }
+  };
 
-      response = await req.get(
-        SERVER_ADRESS + 'following/following/' + route.params.userId,
-      );
-      setFollowing(response.data);
+  const getProfileDetails = async () => {
+    const user = await Auth.getUserById(route.params.userId);
+    setUser(user);
 
-      // Checking if the person visiting if following the person
-      response = await req.get(
-        SERVER_ADRESS + 'following/' + route.params.userId,
-      );
-      setFol(response.data);
-    })();
+    console.log(route.params.userId);
+    const image = await Auth.getImage(route.params.userId);
+    setImage64(image);
+
+    // Getting the posts
+    const token = await Auth.getTokenAsync();
+    const req = axios.create({
+      headers: {
+        authToken: 'Bearer ' + token,
+      },
+    });
+
+    req
+      .get(SERVER_ADRESS + 'posts/user/' + route.params.userId)
+      .then(async response => {
+        setPosts(response.data);
+      })
+      .catch(err => {
+        console.error(err.response.data);
+      });
+
+    var response = await req.get(
+      SERVER_ADRESS + 'following/followers/' + route.params.userId,
+    );
+    setFollowers(response.data);
+
+    response = await req.get(
+      SERVER_ADRESS + 'following/following/' + route.params.userId,
+    );
+    setFollowing(response.data);
+
+    // Checking if the person visiting if following the person
+    response = await req.get(
+      SERVER_ADRESS + 'following/' + route.params.userId,
+    );
+    setFol(response.data);
+
+    const loggedUser = await Auth.getLoggedUserFromDBAsync();
+    const display = loggedUser._id == route.params.userId ? 'none' : 'flex';
+    followButtonRef.current.setNativeProps({
+      style: {
+        display: display,
+      },
+    });
+  };
+
+  useEffect(() => {
+    getProfileDetails();
   }, []);
 
   navigation.setOptions({
@@ -147,6 +183,7 @@ export default function Profile({navigation, route}) {
       </View>
 
       <View
+        ref={followButtonRef}
         style={{
           margin: 8,
         }}>
@@ -190,4 +227,3 @@ export default function Profile({navigation, route}) {
     </SafeAreaView>
   );
 }
-
