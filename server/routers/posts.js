@@ -25,10 +25,19 @@ router.get("/user/:id", tokenValidation.authToken, async (req, res) => {
 });
 
 router.get("/:number", tokenValidation.authToken, async (req, res) => {
+  // Getting the ids of followed peoples
+  const following = client.db().collection("following");
+  const response = await following.find({follower_id: new ObjectId(req.user._id)}).project({following_id: 1, _id: 0}).toArray();
+  let ids = [];
+  for ( var i=0; i<response.length; i++ )
+  {
+    ids.push(response[i].following_id.toString());
+    console.log(response[i].following_id.toString())
+  }
+
   const number = req.params.number;
-  console.log(number);
   var postsDocuments = await posts
-    .find({})
+    .find({user_id: {$in: ids}})
     .sort({ date: -1 })
     .limit(parseInt(number))
     .toArray();

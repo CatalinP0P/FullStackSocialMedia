@@ -15,7 +15,6 @@ const profilePhotos = client.db().collection("profilephotos");
 router.get("/user", tokenValidation.authToken, async (req, res) => { 
   // Gets the logged user
   const tokenUser = req.user;
-  console.log(tokenUser);
   const id = tokenUser._id;
 
   const user = await users.findOne({_id: new ObjectId(id)})
@@ -35,7 +34,6 @@ router.post("/login", async (req, res) => {
 
   // CREATING ACCESS TOKEN
   const token = jwt.sign(user, process.env.ACCESS_TOKEN);
-  console.log(token);
 
   res.header("authToken", token).send();
 });
@@ -46,8 +44,6 @@ router.post("/register", async (req, res) => {
   // HASHING THE PASSWORD
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
-  console.log(hashedPassword);
-
   var user = {
     username: username,
     password: hashedPassword,
@@ -79,7 +75,6 @@ router.post("/register", async (req, res) => {
 router.get("/user/:id", tokenValidation.authToken, async (req, res) => {
   try {
     const user = await users.findOne({ _id: new ObjectId(req.params.id) });
-    console.log(user);
     if (user == null) res.status(400).send("Bad Request, user not found");
     res.send(user);
   } catch (err) {
@@ -110,12 +105,10 @@ router.post("/user/update", tokenValidation.authToken, async (req, res) => {
     }
 
     const response = await users.updateOne({_id: new ObjectId(user._id)}, {$set: {name: name, username: username.toLowerCase(), email: email.toLowerCase()}});
-    console.log(response);
   
     // Updating profile picture
     const profilephotos = client.db().collection("profilephotos");
     const r = await profilephotos.updateOne({userId: new ObjectId(user._id)}, {$set: {image64: image64}});
-    console.log(r);
   
     res.send("User updated");
   }
